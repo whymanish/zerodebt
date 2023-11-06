@@ -8,7 +8,9 @@ const Dashboard = () => {
   const [collectionRecords, setCollectionRecords] = useState([]);
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
-
+  const [isModalOpen, setIsModalOpen] = useState(true); // Set to true to display modal initially
+  const [enteredToken, setEnteredToken] = useState('');
+  const [isValidToken, setIsValidToken] = useState(false);
   const width = ((totalCollection / totalDebt) * 100).toFixed(2);
 
   // Function to fetch data and update the progress bar
@@ -35,28 +37,79 @@ const Dashboard = () => {
     fetchData();
   }, [totalDebt, todayCollection]);
 
+  useEffect(() => {
+    if (isValidToken) {
+      // Fetch data only when the token is valid
+      fetchData();
+    }
+  }, [isValidToken]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newCollection = { date, amount };
-
-    try {
-      const response = await axios.post('http://localhost:5000/api/add-collection', newCollection);
-      console.log(response.data);
-      setDate('');
-      setAmount('');
-
-      // After adding data, trigger data fetching to update the collectionRecords
-      fetchData();
-    } catch (error) {
-      console.error(error);
+    if (enteredToken === 'JUNIPER') {
+      setIsValidToken(true);
+      setIsModalOpen(false); // Close the modal when the token is valid
+    } else {
+      setIsValidToken(false);
     }
+    // Check if the date and amount are not empty
+    if (date && amount) {
+      const newCollection = { date, amount };
+
+      try {
+        const response = await axios.post('http://localhost:5000/api/add-collection', newCollection);
+        console.log(response.data);
+        setDate('');
+        setAmount('');
+
+        // After adding data, trigger data fetching to update the collectionRecords
+        fetchData();
+      } catch (error) {
+        console.error(error);
+      }
+    } 
+    
   };
 
   return (
     <div>
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="modal-container bg-gray-100 w-full max-w-md mx-auto rounded-2xl  z-50 overflow-y-auto">
+            <div className="modal-content py-4 text-left px-6">
+              <div className="modal-header">
+                <h3 className="text-2xl font-semibold">Enter Secret Token</h3>
+              </div>
+              <form onSubmit={handleSubmit}>
+                <div className="modal-body mt-2">
+                  <input
+                    type="password"
+                    value={enteredToken}
+                    onChange={(e) => setEnteredToken(e.target.value)}
+                    placeholder="Secret Token"
+                    className="input-box border border-gray-300 p-2 w-full rounded-xl mt-2 focus:outline-none focus:ring focus:ring-blue-200"
+                  />
+                  {!isValidToken && (
+                    <p className="text-red-500 mt-2 text-sm">Enter Correct Token</p>
+                  )}
+                </div>
+                <div className="modal-footer mt-4">
+                  <button
+                    type="submit"
+                    className="bg-blue-500 text-white font-medium px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {isValidToken && (
       <div className='max-w-7xl p-4 mx-auto mt-12'>
         <div className='w-full py-8 bg-gray-800 rounded-2xl dark:bg-gray-700'>
-          <h1 className='text-5xl text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600 font-bold text-center'>{width}% Completed</h1>
+          <h1 className='text-5xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 font-bold text-center'>{width}% Completed</h1>
         </div>
         <div className='flex justify-center'>
           <div className='grid mt-10 lg:grid-cols-3 gap-4'>
@@ -72,7 +125,7 @@ const Dashboard = () => {
             </div>
             <div className='bg-[conic-gradient(at_right,_var(--tw-gradient-stops))] from-indigo-200 via-slate-600 to-indigo-200 rounded-xl w-96 h-20'>
               <h1 className='text-2xl font-bold text-white text-center mt-6'>
-                Today's Collection : {todayCollection} RS
+                Today's Collection: {collectionRecords.reduce((total, record) => record.amount, 0)} RS
               </h1>
             </div>
           </div>
@@ -95,6 +148,7 @@ const Dashboard = () => {
                     onChange={(e) => setDate(e.target.value)}
                     className='block w-full px-4 py-4 mt-2 text-gray-700 bg-white border rounded-xl'
                     placeholder='Enter Date'
+                    required // Add the required attribute
                   />
                 </div>
                 <div className=''>
@@ -108,6 +162,8 @@ const Dashboard = () => {
                     onChange={(e) => setAmount(e.target.value)}
                     className='block w-full px-4 py-4 mt-2 text-gray-700 bg-white border rounded-xl'
                     placeholder='Enter Amount'
+                    required // Add the required attribute
+                    pattern='[0-9]*' // Allow only numeric values
                   />
                 </div>
                 <div className=''>
@@ -160,6 +216,7 @@ const Dashboard = () => {
           </table>
         </div>
       </div>
+       )}
     </div>
   );
 };
