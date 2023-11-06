@@ -72,7 +72,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div>
+    <div >
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="modal-container bg-gray-100 w-full max-w-md mx-auto rounded-2xl  z-50 overflow-y-auto">
