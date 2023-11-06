@@ -46,7 +46,7 @@ const Dashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (enteredToken === 'JUNIPER') {
+    if (enteredToken === 'DEBTZERO') {
       setIsValidToken(true);
       setIsModalOpen(false); // Close the modal when the token is valid
     } else {
@@ -182,8 +182,9 @@ const Dashboard = () => {
           </div>
         </div>
         <div className='relative max-w-4xl mx-auto overflow-x-auto shadow-md mt-4 sm:rounded-lg'>
+          <div className='h-64 scrollbar-hide overflow-y-auto' >
           <table className='w-full text-sm text-left text-gray-500 dark:text-gray-400'>
-            <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+            <thead className='  text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
               <tr>
                 <th scope='col' className='px-6 py-3'>
                   Sr.No
@@ -214,6 +215,7 @@ const Dashboard = () => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
        )}
