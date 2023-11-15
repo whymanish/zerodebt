@@ -16,7 +16,7 @@ const Dashboard = () => {
   // Function to fetch data and update the progress bar
   const fetchData = async () => {
     try {
-      const apiUrl = 'http://localhost:5000/api';
+      const apiUrl = '/api';
 
       const summaryResponse = await axios.get(`${apiUrl}/summary`);
       const collectionResponse = await axios.get(`${apiUrl}/collection-records`);
@@ -57,7 +57,7 @@ const Dashboard = () => {
       const newCollection = { date, amount };
 
       try {
-        const response = await axios.post('http://localhost:5000/api/add-collection', newCollection);
+        const response = await axios.post('/api/add-collection', newCollection);
         console.log(response.data);
         setDate('');
         setAmount('');
